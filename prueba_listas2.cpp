@@ -56,6 +56,7 @@ int main(){
     }
     liberar(lista);
 
+    return 0;
 }
 
 void agregarPrimero(Nodo *&Lista,alum valor){
