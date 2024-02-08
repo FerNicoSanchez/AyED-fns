@@ -24,6 +24,7 @@ int main(){
 
     mostrar(Lista);
     liberar(Lista);
+    return 0;
 }
 
 void agregarPrimero(Nodo *&Lista,int valor){
