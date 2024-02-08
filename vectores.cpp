@@ -134,4 +134,5 @@ int main(){
     eliminar(vec,len,2);
     mostrar(vec,max);
     mostrar(vec,len);
+    return 0;
 }
