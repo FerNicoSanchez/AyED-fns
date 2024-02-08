@@ -3,4 +3,4 @@ Alias: FNS
 Email: fernandonicolasanchez@gmail.com
 URL: https://github.com/FerNicoSanchez/AyED-fns.git
 rama remota: origin main
-Se crea subcarpeta para ejercicios resueltos
+
