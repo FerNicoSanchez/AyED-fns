@@ -114,5 +114,6 @@ int main()
     cout << "Persona eliminada de la cola: " << persona_eliminada2.inicial << endl;
     persona_eliminada2 = suprimir(cfte,cfin);
     cout << "Persona eliminada de la cola: " << persona_eliminada2.inicial << endl;
+    return 0;
 
 }
