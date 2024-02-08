@@ -45,7 +45,7 @@ void mostrar(int vec[], int len){
     cout << "*********************************************" << endl;
 }
 
-void cargarVector(int vec[], int &len, int cant_pos){
+void cargarVector(int vec[], int &len, int cant_pos){   //Se carga vector mediante el ingreso por pantalla del usuario.
     cout << "Iniciamos la carga masiva del vector de " << cant_pos << " posiciones." << endl;
     for(int i=0; i<cant_pos ; i++){
         cout << "Ingrese el " << i+1 << "º dato: ";
@@ -54,7 +54,7 @@ void cargarVector(int vec[], int &len, int cant_pos){
     }
 }
 
-void insertar(int vec[], int &len, int valor, int pos){
+void insertar(int vec[], int &len, int valor, int pos){ //Inserta un dato en una posicion especifica.
     for(int i=len; i>pos ; i--){
         vec[i] = vec[i-1];
     }
@@ -62,7 +62,7 @@ void insertar(int vec[], int &len, int valor, int pos){
     len++;
 }
 
-void insertarOrdenado(int vec[], int &len, int valor){
+void insertarOrdenado(int vec[], int &len, int valor){  //Inserta un dato segun el orden ascendente.
     int i=0;
     while( i<len && vec[i]<valor){
         i++;
@@ -76,7 +76,7 @@ void insertarOrdenado(int vec[], int &len, int valor){
     }
 }
 
-int buscar(int vec[], int len , int valor){
+int buscar(int vec[], int len , int valor){     //Busca un dato y devuelve el indice donde lo encontro.
     int i=0;
     while( i<len && vec[i]!=valor){
         i++;
@@ -89,7 +89,7 @@ int buscar(int vec[], int len , int valor){
     }
 }
 
-void eliminar(int vec[], int &len, int pos){
+void eliminar(int vec[], int &len, int pos){    //Elimina un dato.
     for(int i=pos; i<len-1 ; i++){
         vec[i] = vec[i+1];
     }
