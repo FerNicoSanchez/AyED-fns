@@ -1,5 +1,5 @@
 /**
- * Ejercicio 14
+ * Ejercicio 15
  * Author: FNS
  * Descripción: Se realiza una inspección en una fábrica de pinturas, y se detectaron 20
  *              infracciones. De cada infracción se tomó nota de los siguientes datos:
