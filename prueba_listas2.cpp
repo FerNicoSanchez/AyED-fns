@@ -13,6 +13,7 @@ struct Nodo{
     alum info;
     Nodo * sgte;
 };
+
 void agregarPrimero(Nodo *&Lista,alum valor);
 alum eliminarPrimero(Nodo *&Lista);
 void insertarOrdenado(Nodo*&,alum);
