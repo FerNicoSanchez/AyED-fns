@@ -13,6 +13,17 @@ struct Nodo{
     Nodo * sgte;
 };
 
+struct Producto{
+    int id;
+    int cant;
+    char tipo;
+};
+
+struct Pan{
+    int id;
+    int cant;
+};
+
 //Prototipos
 
 void push(Nodo*&pila,int valor);
@@ -31,6 +42,8 @@ void unionPilas(Nodo *&pilaA,Nodo*&pilaB,Nodo*&pilaC);
 void unionListas(Nodo * listaA,Nodo * ListaB, Nodo*&ListaC);
 Nodo * intersecListas(Nodo * lista1, Nodo * lista2);
 Nodo * intersecPilaLista(Nodo *lista,Nodo*&pila);
+void consolidarBurgerFast(FILE * arch1,FILE * arch2);
+void filtrarPan(FILE * arch1, FILE * arch2);
 
 //Implementación de funciones
 
@@ -234,9 +247,96 @@ Nodo * intersecPilaLista(Nodo *lista,Nodo*&pila){   //Ej 2 e)
     return nuevo;
 }
 
+void consolidarBurgerFast(FILE * arch1,FILE * arch2){   //EJ 3 a)
+    FILE * consolidado = fopen("BurgerFast.dat","wb");
+    Producto reg_prod;
+    if( consolidado != nullptr ){
+        fread(&reg_prod,sizeof(struct Producto),1,arch1);
+        while(!(feof(arch1))){
+            fwrite(&reg_prod,sizeof(struct Producto),1,consolidado);
+            fread(&reg_prod,sizeof(struct Producto),1,arch1);
+        }
+        fread(&reg_prod,sizeof(struct Producto),1,arch2);
+        while(!(feof(arch2))){
+            fwrite(&reg_prod,sizeof(struct Producto),1,consolidado);
+            fread(&reg_prod,sizeof(struct Producto),1,arch2);
+        }
+    }
+    else{
+        cout << "Error al crear consolidado." << endl;
+    }
+    fclose(consolidado);
+}
+
+void filtrarPan(FILE * arch1, FILE * arch2){    //Ej 3 b)
+
+    FILE * arch_panes = fopen("Pan.dat","wb");
+    Pan reg_pan;
+    Producto reg_prod;
+    if ( arch_panes != nullptr ){
+        fread(&reg_prod,sizeof(struct Producto),1,arch1);
+        while( !feof(arch1)){
+            if(reg_prod.tipo == 'P'){
+                reg_pan.id = reg_prod.id;
+                reg_pan.cant = reg_prod.cant;
+                fwrite(&reg_pan,sizeof(struct Pan),1,arch_panes);
+            }
+            fread(&reg_prod,sizeof(struct Producto),1,arch1);
+        }
+        fread(&reg_prod,sizeof(struct Producto),1,arch2);
+        while( !feof(arch2)){
+            if(reg_prod.tipo == 'P'){
+                reg_pan.id = reg_prod.id;
+                reg_pan.cant = reg_prod.cant;
+                fwrite(&reg_pan,sizeof(struct Pan),1,arch_panes);
+            }
+            fread(&reg_prod,sizeof(struct Producto),1,arch2);
+        }
+    }
+    else{
+        cout << "Problemas al crear archivo Pan.dat" << endl;
+    }
+    fclose(arch_panes);
+}
+
 //Prueba de funciones
 
 int main(){
+    FILE * arch_agosto = fopen("BurgerFastAgosto.dat","rb");
+    FILE * arch_sept = fopen("BurgerFastSeptiembre.dat","rb");
+    Producto aux;
+    consolidarBurgerFast(arch_agosto,arch_sept);
+    FILE * consolidado = fopen("BurgerFast.dat","rb");
+
+    fread(&aux,sizeof(struct Producto),1,consolidado);
+    while(!feof(consolidado)){
+        cout << endl << "ID: " << aux.id << endl;
+        cout << "Cant: " << aux.cant << endl;
+        cout << "Tipo: " << aux.tipo << endl;
+        fread(&aux,sizeof(struct Producto),1,consolidado);
+    }
+    fclose(arch_agosto);
+    fclose(arch_sept);
+    fclose(consolidado);
+
+    cout << endl << "-------------------------------" << endl;
+
+    FILE * arch_agosto2 = fopen("BurgerFastAgosto.dat","rb");
+    FILE * arch_sept2 = fopen("BurgerFastSeptiembre.dat","rb");
+    Pan reg_pan;
+
+    filtrarPan(arch_agosto2,arch_sept2);
+    FILE * arch_pan = fopen("Pan.dat","rb");
+
+    fread(&reg_pan,sizeof(struct Pan),1,arch_pan);
+    while(!feof(arch_pan)){
+        cout << endl << "ID: " << reg_pan.id << endl;
+        cout << "Cant: " << reg_pan.cant << endl;
+        fread(&reg_pan,sizeof(struct Pan),1,arch_pan);
+    }
+    fclose(arch_agosto2);
+    fclose(arch_sept2);
+    fclose(arch_pan);
 
     return 0;
 }
