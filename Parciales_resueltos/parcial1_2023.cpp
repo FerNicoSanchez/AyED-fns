@@ -8,6 +8,8 @@
 
 using namespace std;
 
+#define max_ciudades 20
+
 struct Nodo{
     int info;
     Nodo * sgte;
@@ -24,6 +26,22 @@ struct Pan{
     int cant;
 };
 
+struct Pre_viaje{
+    int id;
+    int reservas;
+    int visitantes;
+};
+
+struct Reserva{
+    int id;
+    int visitantes;
+};
+
+struct Nodo4{
+    Reserva info;
+    Nodo4 * sgte;
+};
+
 //Prototipos
 
 void push(Nodo*&pila,int valor);
@@ -32,11 +50,13 @@ void agregar(Nodo*&cfte,Nodo*&cfin,int valor);
 int suprimir(Nodo*&cfte,Nodo*&cfin);
 void unionVectores(int A[],int B[], int C[]);
 void agregarPrimero(Nodo *&Lista,int valor);
+void agregarReserva(Nodo4 *&Lista,Reserva valor);
 int eliminarPrimero(Nodo *&Lista);
 void insertarOrdenado(Nodo*&,int);
 void mostrarLista(Nodo*);
 Nodo * buscar(Nodo * Lista, int valor);
 void liberar(Nodo*&lista);
+void liberar4(Nodo4*&lista);
 void unionColas(Nodo*&cfteA,Nodo*&cfinA,Nodo*&cfteB,Nodo*&cfinB,Nodo*&cfteC,Nodo*&cfinC);
 void unionPilas(Nodo *&pilaA,Nodo*&pilaB,Nodo*&pilaC);
 void unionListas(Nodo * listaA,Nodo * ListaB, Nodo*&ListaC);
@@ -44,6 +64,10 @@ Nodo * intersecListas(Nodo * lista1, Nodo * lista2);
 Nodo * intersecPilaLista(Nodo *lista,Nodo*&pila);
 void consolidarBurgerFast(FILE * arch1,FILE * arch2);
 void filtrarPan(FILE * arch1, FILE * arch2);
+void inicializar(Pre_viaje vec[], int cant_pos, int valor_inicial);
+void mostrar(Pre_viaje vec[], int len);
+void insertar(Pre_viaje vec[], int &len, Pre_viaje valor, int pos);
+void actualizarReservas(Pre_viaje vec[],int &len, Nodo4 * lista);
 
 //Implementación de funciones
 
@@ -143,6 +167,15 @@ Nodo * buscar(Nodo * Lista, int valor){
 
 void liberar(Nodo*&lista){
     Nodo*aux=NULL;
+    while(lista!=NULL){
+        aux=lista;
+        lista=lista->sgte;
+        delete(aux);
+    }
+}
+
+void liberar4(Nodo4*&lista){
+    Nodo4*aux=NULL;
     while(lista!=NULL){
         aux=lista;
         lista=lista->sgte;
@@ -299,61 +332,99 @@ void filtrarPan(FILE * arch1, FILE * arch2){    //Ej 3 b)
     fclose(arch_panes);
 }
 
+void agregarReserva(Nodo4 *&Lista,Reserva valor){
+    Nodo4 * nuevo = new Nodo4();
+    nuevo->info = valor;
+    nuevo->sgte = Lista;
+    Lista = nuevo;
+}
+
+void inicializar(Pre_viaje vec[], int cant_pos, int valor_inicial){
+    for( int i=0 ; i<cant_pos ; i++){   //Recorremos todo el vector completo.
+        vec[i].id = valor_inicial;           //A cada posición le asignamos el valor indicado.
+        vec[i].reservas = valor_inicial;
+        vec[i].visitantes = valor_inicial;
+    }
+}
+
+void mostrar(Pre_viaje vec[], int len){
+    cout << "*******Mostrando valores del vector**********" << endl;
+    for( int i = 0 ; i<len ; i++ ){         //Recorremos el vector hasta la cantidad de datos cargados.
+        cout << i+1 << "º Dato: " << endl;
+        cout << "Código de ciudad: " << vec[i].id << endl;    //Imprimimos en orden todos los datos junto a su indice sumado 1.
+        cout << "Cantidad de reservas: " << vec[i].reservas << endl;
+        cout << "Código de visitantes: " << vec[i].visitantes << endl;
+    }
+    cout << "*********************************************" << endl;
+}
+
+void insertar(Pre_viaje vec[], int &len, Pre_viaje valor, int pos){ //Inserta un dato en una posicion especifica.
+    for(int i=len; i>pos ; i--){
+        vec[i] = vec[i-1];
+    }
+    vec[pos] = valor;
+    len++;
+}
+
+void actualizarReservas(Pre_viaje vec[],int &len, Nodo4 * lista){   //EJ 4
+    while(lista != NULL){
+        for(int i=0 ; i<len ; i++){
+            if(lista->info.id == vec[i].id){
+                vec[i].visitantes += lista->info.visitantes;
+                vec[i].reservas++;
+            }
+        }
+        lista = lista->sgte;
+    }
+}
+
 //Prueba de funciones
 
 int main(){
-    // Ejercicio 1
-    int A[10];
-    int B[10];
-    int C[20];
+    
+    Pre_viaje ciudad[max_ciudades];
+    Nodo4 * lista = NULL;
+    Reserva reg_reserva;
 
-    for(int i = 0 ; i<10 ; i++){
-        A[i] = i*10;
+    ciudad[0].id = 1;
+    ciudad[0].reservas = 0;
+    ciudad[0].visitantes = 0;
+
+    ciudad[1].id = 2;
+    ciudad[1].reservas = 5;
+    ciudad[1].visitantes = 25;
+
+    ciudad[2].id = 3;
+    ciudad[2].reservas = 1;
+    ciudad[2].visitantes = 7;
+
+    ciudad[3].id = 4;
+    ciudad[3].reservas = 14;
+    ciudad[3].visitantes = 100;
+
+    ciudad[4].id = 5;
+    ciudad[4].reservas = 30;
+    ciudad[4].visitantes = 55;
+
+    ciudad[5].id = 6;
+    ciudad[5].reservas = 0;
+    ciudad[5].visitantes = 0;
+
+    int len = 6;
+
+    for(int i=0; i<5;i++){
+        cout << endl << "Ingrese cod de ciudad: ";
+        cin >> reg_reserva.id;
+        cout << "Ingrese cant visitantes: ";
+        cin >> reg_reserva.visitantes;
+        agregarReserva(lista,reg_reserva);
     }
-    for(int i = 0 ; i<10 ; i++){
-        B[i] = 7;
-    }
-    unionVectores(A,B,C);
 
-    for( int i = 0; i<20 ; i++){
-        cout << i+1 <<"º dato: " << C[i] << endl; 
-    }
-    //Fin ejercicio 1
-    FILE * arch_agosto = fopen("BurgerFastAgosto.dat","rb");
-    FILE * arch_sept = fopen("BurgerFastSeptiembre.dat","rb");
-    Producto aux;
-    consolidarBurgerFast(arch_agosto,arch_sept);
-    FILE * consolidado = fopen("BurgerFast.dat","rb");
+    actualizarReservas(ciudad,len,lista);
 
-    fread(&aux,sizeof(struct Producto),1,consolidado);
-    while(!feof(consolidado)){
-        cout << endl << "ID: " << aux.id << endl;
-        cout << "Cant: " << aux.cant << endl;
-        cout << "Tipo: " << aux.tipo << endl;
-        fread(&aux,sizeof(struct Producto),1,consolidado);
-    }
-    fclose(arch_agosto);
-    fclose(arch_sept);
-    fclose(consolidado);
+    mostrar(ciudad,len);
 
-    cout << endl << "-------------------------------" << endl;
-
-    FILE * arch_agosto2 = fopen("BurgerFastAgosto.dat","rb");
-    FILE * arch_sept2 = fopen("BurgerFastSeptiembre.dat","rb");
-    Pan reg_pan;
-
-    filtrarPan(arch_agosto2,arch_sept2);
-    FILE * arch_pan = fopen("Pan.dat","rb");
-
-    fread(&reg_pan,sizeof(struct Pan),1,arch_pan);
-    while(!feof(arch_pan)){
-        cout << endl << "ID: " << reg_pan.id << endl;
-        cout << "Cant: " << reg_pan.cant << endl;
-        fread(&reg_pan,sizeof(struct Pan),1,arch_pan);
-    }
-    fclose(arch_agosto2);
-    fclose(arch_sept2);
-    fclose(arch_pan);
+    liberar4(lista);
 
     return 0;
 }
