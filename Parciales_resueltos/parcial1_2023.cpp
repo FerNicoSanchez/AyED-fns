@@ -29,7 +29,7 @@ void unionVectores(int A[],int B[],int C[]){        //Ejercicio 1
 //Prueba de funciones
 
 int main(){
-
+    // Ejercicio 1
     int A[10];
     int B[10];
     int C[20];
@@ -45,6 +45,7 @@ int main(){
     for( int i = 0; i<20 ; i++){
         cout << i+1 <<"º dato: " << C[i] << endl; 
     }
+    //Fin ejercicio 1
 
     return 0;
 }
