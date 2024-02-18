@@ -378,6 +378,7 @@ void actualizarReservas(Pre_viaje vec[],int &len, Nodo4 * lista){   //EJ 4
     }
 }
 
+//NOTA: EL EJERCICIO 5 ES EXACTAMENTE LO MISMO QUE EL 4 SOLO QUE CAMBIAMOS DE NOMBRE LOS DATOS.
 //Prueba de funciones
 
 int main(){
