@@ -302,6 +302,23 @@ void filtrarPan(FILE * arch1, FILE * arch2){    //Ej 3 b)
 //Prueba de funciones
 
 int main(){
+    // Ejercicio 1
+    int A[10];
+    int B[10];
+    int C[20];
+
+    for(int i = 0 ; i<10 ; i++){
+        A[i] = i*10;
+    }
+    for(int i = 0 ; i<10 ; i++){
+        B[i] = 7;
+    }
+    unionVectores(A,B,C);
+
+    for( int i = 0; i<20 ; i++){
+        cout << i+1 <<"º dato: " << C[i] << endl; 
+    }
+    //Fin ejercicio 1
     FILE * arch_agosto = fopen("BurgerFastAgosto.dat","rb");
     FILE * arch_sept = fopen("BurgerFastSeptiembre.dat","rb");
     Producto aux;
