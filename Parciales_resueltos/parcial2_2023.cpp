@@ -40,6 +40,7 @@ Para Aprobar se requiere 1 punto de Teoría y el 5 puntos de práctica.
 using namespace std;
 
 #define max_muebles 200
+#define max_hoteles 100
 
 //--------Estructuras-----------
 
@@ -52,6 +53,34 @@ struct Mueble{
     int id_fabricante;
     int id_producto;
     int unidades;
+};
+
+struct Hotel{
+    int id_hotel;
+    int reservas;
+    int cant_huespedes;
+};
+
+struct Reserva{
+    int id_hotel;
+    char pre_viaje;
+    int cant_huespedes;
+};
+
+struct NodoR{
+    Reserva info;
+    NodoR * sgte;
+};
+
+struct Producto{
+    int id_producto;
+    int peso;
+    int stock;
+};
+
+struct NodoP{
+    Producto info;
+    NodoP * sgte;
 };
 
 //---------Prototipos-----------
@@ -67,6 +96,11 @@ void insertarOrdenado(Nodo*&,int valor);
 void mostrarLista(Nodo* lista);
 void liberar(Nodo*&lista);
 
+void agregarPrimeroR(NodoR *&Lista,Reserva valor);
+void insertarOrdenadoR(NodoR*&,Reserva valor);
+void mostrarListaReservas(NodoR* lista);
+void liberarR(NodoR*&lista);
+
 Nodo * unionListaPila(Nodo * lista, Nodo * &pila);
 void interseccionOrdenadaListas(Nodo * lista1, Nodo * lista2, Nodo * &lista_nueva);
 
@@ -74,8 +108,27 @@ void mostrar(Mueble vec[], int len);
 void insertar(Mueble vec[], int &len, Mueble valor, int pos);
 void cargarMueble(Mueble vec[], int &len, int cant_pos);
 
+void mostrarHoteles(Hotel vec[], int len);
+
 void maxFabricante(Mueble vec[],int len);
 void maxMueble(Mueble vec[],int len);
+
+void actualizarReservas(Hotel vec[], int len, NodoR * reservas);
+
+void insertarOrdenadoP(NodoP*&lista,Producto valor);
+void liberarP(NodoP*&lista);
+
+void ordenarProductos(FILE * archivo);
+
+void crearArchivo();
+
+void mostrarArchivoProd();
+
+NodoP * filtrarProdSinStock();
+
+NodoP * filtrarProdPesados();
+
+void mostrarProductos(NodoP *lista);
 //--Implementación de funciones--
 
 bool promo(int nota1, int nota2){               //Ej 1 a)
@@ -163,6 +216,56 @@ void liberar(Nodo*&lista){
     }
 }
 
+void agregarPrimeroR(NodoR *&Lista,Reserva valor){
+    NodoR * nuevo = new NodoR();
+    nuevo->info = valor;
+    nuevo->sgte = Lista;
+    Lista = nuevo;
+}
+
+void insertarOrdenadoR(NodoR*&lista,Reserva valor){
+    NodoR*nuevo= new NodoR();
+    nuevo->info = valor;
+    nuevo->sgte = NULL;
+
+    NodoR*aux=lista;
+    NodoR*ant=NULL;
+
+    while(aux!=NULL && nuevo->info.id_hotel > aux->info.id_hotel ){
+        ant=aux;
+        aux=aux->sgte;
+    }
+    if(ant==NULL){
+        lista=nuevo;
+    }
+    else{
+        ant->sgte = nuevo;
+    }
+    nuevo->sgte = aux;
+}
+
+void mostrarListaReservas(NodoR*lista){
+    NodoR * aux = lista;
+    if(aux==NULL){
+        cout << "No hay datos cargados en la lista." << endl;
+    }
+    while(aux!=NULL){
+        cout << endl << "El Código del hotel es : " << aux->info.id_hotel << endl;
+        cout << "Estado Pre-viaje : " << aux->info.pre_viaje << endl;
+        cout << "Cantidad de huespedes : " << aux->info.cant_huespedes << endl;
+        aux = aux->sgte;
+    }
+}
+
+void liberarR(NodoR*&lista){
+    NodoR*aux=NULL;
+    while(lista!=NULL){
+        aux=lista;
+        lista=lista->sgte;
+        delete(aux);
+    }
+}
+
 Nodo * unionListaPila(Nodo * lista, Nodo * &pila){   //Ej 2 a)
     Nodo * nuevo = NULL;
     int dato_pila;
@@ -205,6 +308,17 @@ void mostrar(Mueble vec[], int len){
         cout << "Código de fabricante: " << vec[i].id_fabricante << endl;
         cout << "Código de producto: " << vec[i].id_producto << endl;
         cout << "Cantidad de unidades en deposito: " << vec[i].unidades << endl;
+    }
+    cout << "*********************************************" << endl;
+}
+
+void mostrarHoteles(Hotel vec[], int len){
+    cout << "*******Mostrando valores del vector**********" << endl;
+    for( int i = 0 ; i<len ; i++ ){                     //Recorremos el vector hasta la cantidad de datos cargados.
+        cout << i+1 << "º Dato: " << endl;    //Imprimimos en orden todos los datos junto a su indice sumado 1.
+        cout << "Código de hotel: " << vec[i].id_hotel << endl;
+        cout << "Cantidad de reservas: " << vec[i].reservas << endl;
+        cout << "Cantidad de huéspedes: " << vec[i].cant_huespedes << endl;
     }
     cout << "*********************************************" << endl;
 }
@@ -272,6 +386,152 @@ void maxMueble(Mueble vec[],int len){           //Ej 3 b)
     cout << id_producto << ", con " << max_unidades << " unidades." << endl;
 }
 
+void actualizarReservas(Hotel vec[],int len, NodoR * reservas){ //Ej 4
+    while( reservas != NULL){
+        if(reservas->info.pre_viaje == 'S'){
+            for(int i=0; i<len ; i++){
+                if(reservas->info.id_hotel == vec[i].id_hotel){
+                    vec[i].cant_huespedes += reservas->info.cant_huespedes;
+                    vec[i].reservas++;
+                    break;
+                }
+            }
+        }
+        reservas = reservas->sgte;
+    }
+}
+
+void insertarOrdenadoP(NodoP*&lista,Producto valor){
+    NodoP*nuevo= new NodoP();
+    nuevo->info = valor;
+    nuevo->sgte = NULL;
+
+    NodoP*aux=lista;
+    NodoP*ant=NULL;
+
+    while(aux!=NULL && nuevo->info.id_producto > aux->info.id_producto ){
+        ant=aux;
+        aux=aux->sgte;
+    }
+    if(ant==NULL){
+        lista=nuevo;
+    }
+    else{
+        ant->sgte = nuevo;
+    }
+    nuevo->sgte = aux;
+}
+
+void liberarP(NodoP*&lista){
+    NodoP*aux=NULL;
+    while(lista!=NULL){
+        aux=lista;
+        lista=lista->sgte;
+        delete(aux);
+    }
+}
+
+void ordenarProductos(FILE * archivo_lectura){  //Ej 5 a)
+    Producto reg_prod;
+    NodoP * lista_prod = NULL;
+
+    fread(&reg_prod,sizeof(struct Producto),1,archivo_lectura);
+    while(!feof(archivo_lectura)){
+        insertarOrdenadoP(lista_prod,reg_prod);
+        fread(&reg_prod,sizeof(struct Producto),1,archivo_lectura);
+    }
+    fclose(archivo_lectura);
+    FILE * archivo_escritura = fopen("PROD.dat","wb");
+    NodoP * aux = lista_prod;
+    while( aux != NULL){
+        fwrite(&aux->info,sizeof(struct Producto),1,archivo_escritura);
+        aux = aux->sgte;
+    }
+    fclose(archivo_escritura);
+    liberarP(lista_prod);
+}
+
+void crearArchivo(){
+    FILE * archivo_prod = fopen("PROD.dat","wb");
+    Producto reg_prod;
+    reg_prod.id_producto = -1;
+    cout << endl << "---- Iniciamos carga de archivo PROD.dat ----" << endl;
+    while(reg_prod.id_producto != 0){
+        cout << endl << "Ingrese código de producto o 0 para salir: ";
+        cin >> reg_prod.id_producto;
+        if(reg_prod.id_producto == 0) { continue; }
+        cout << "Ingrese peso del producto: ";
+        cin >> reg_prod.peso;
+        cout << "Ingrese cantidad de stock del producto: ";
+        cin >> reg_prod.stock;
+
+        fwrite(&reg_prod,sizeof(struct Producto),1,archivo_prod);
+    }
+    cout << endl;
+    fclose(archivo_prod);
+}
+
+void mostrarArchivoProd(){
+    FILE * archivo_prod = fopen("PROD.dat","rb");
+    Producto reg_prod;
+    cout << endl << "------------- Archivo PROD.dat ----------------" << endl;
+    fread(&reg_prod,sizeof(struct Producto),1,archivo_prod);
+    while(!feof(archivo_prod)){
+        cout << endl << "Código del producto: " << reg_prod.id_producto << endl;
+        cout << "Peso del producto: " << reg_prod.peso << endl;
+        cout << "Cantidad de stock del producto: " << reg_prod.stock << endl;
+        fread(&reg_prod,sizeof(struct Producto),1,archivo_prod);
+    }
+    fclose(archivo_prod);
+}
+
+NodoP * filtrarProdSinStock(){                      //EJ 5 b)
+    FILE * archivo_prod = fopen("PROD.dat","rb");
+    Producto reg_prod;
+    NodoP * lista_prod = NULL;
+
+    fread(&reg_prod,sizeof(struct Producto),1,archivo_prod);
+    while(!feof(archivo_prod)){
+        if(reg_prod.stock == 0){
+            insertarOrdenadoP(lista_prod,reg_prod);
+        }
+        fread(&reg_prod,sizeof(struct Producto),1,archivo_prod);
+    }
+    fclose(archivo_prod);
+    return lista_prod;
+}
+
+NodoP * filtrarProdPesados(){                       //EJ 5 b)
+    FILE * archivo_prod = fopen("PROD.dat","rb");
+    Producto reg_prod;
+    NodoP * lista_prod = NULL;
+
+    fread(&reg_prod,sizeof(struct Producto),1,archivo_prod);
+    while(!feof(archivo_prod)){
+        if(reg_prod.peso > 100){
+            insertarOrdenadoP(lista_prod,reg_prod);
+        }
+        fread(&reg_prod,sizeof(struct Producto),1,archivo_prod);
+    }
+    fclose(archivo_prod);
+    return lista_prod;
+}
+
+void mostrarProductos(NodoP *lista){
+    NodoP * aux = lista;
+    if(aux==NULL){
+        cout << "No hay datos cargados en la lista." << endl;
+    }
+    cout << endl << "-------Mostrando lista de productos-------" << endl;
+    while(aux!=NULL){
+        cout << endl << "El código de producto : " << aux->info.id_producto << endl;
+        cout << "El Peso : " << aux->info.peso << endl;
+        cout << "Stock : " << aux->info.stock << endl;
+        aux = aux->sgte;
+    }
+}
+
+
 //-----Prueba de funciones----
 
 int main(){
@@ -338,9 +598,8 @@ int main(){
                     if( menu2 == 0 ) { continue; }
                     agregarPrimero(lista1,menu2);
                 }
-                mostrarLista(lista1);
                 lista2 = unionListaPila(lista1,pila);
-                cout << endl << "---La lista resultante de la union---" << endl;
+                cout << endl << "------ Lista resultante de la union -------" << endl << endl;
                 mostrarLista(lista2);
                 cout << endl << "Ejercicio 2 b)" << endl;
                 menu2 = -1;
@@ -377,12 +636,71 @@ int main(){
             break;
         case 4:
             {
+                cout << endl << "Ejercicio 4)" << endl;
+                cout << "Para cargar la info de hoteles se debe modificar el código." << endl;
+                Hotel hoteles[max_hoteles];
+                int len = 0;
+                int menu2 = -1;
+                NodoR * reservas = NULL;
+                Reserva reserva;
 
+                hoteles[0].id_hotel = 1;
+                hoteles[0].reservas = 0;
+                hoteles[0].cant_huespedes = 0;
+                len++;
+                
+                hoteles[1].id_hotel = 2;
+                hoteles[1].reservas = 100;
+                hoteles[1].cant_huespedes = 500;
+                len++;
+
+                hoteles[2].id_hotel = 3;
+                hoteles[2].reservas = 7;
+                hoteles[2].cant_huespedes = 14;
+                len++;
+                
+                hoteles[3].id_hotel = 4;
+                hoteles[3].reservas = 50;
+                hoteles[3].cant_huespedes = 50;
+                len++;
+                
+                mostrarHoteles(hoteles,len);
+                cout << "----- Iniciamos carga de lista de reservas ----" << endl;
+                while(menu2 != 0){
+                    cout << endl << "Ingrese código de hotel o 0 para salir: ";
+                    cin >> reserva.id_hotel;
+                    if(reserva.id_hotel == 0){
+                        menu2 = 0;
+                        continue;
+                    }
+                    cout << "Ingrese estado de pre-viaje (S o N): ";
+                    cin >> reserva.pre_viaje;
+                    cout << "Ingrese cantidad de huéspedes: ";
+                    cin >> reserva.cant_huespedes;
+                    insertarOrdenadoR(reservas,reserva);
+                }
+                actualizarReservas(hoteles,len,reservas);
+                mostrarHoteles(hoteles,len);
+                liberarR(reservas);
             }
             break;
         case 5:
             {
-
+                cout << endl << "Ejercicio 5 a)" << endl;
+                crearArchivo();
+                FILE * archivo_lectura = fopen("PROD.dat","rb"); //El archivo se cierra en la prox función.
+                ordenarProductos(archivo_lectura);
+                cout << endl << "Archivo ordenado." << endl;
+                mostrarArchivoProd();
+                cout << endl << "Ejercicio 5 b)" << endl;
+                NodoP * lista_pesados = filtrarProdPesados();
+                NodoP * lista_sin_stock = filtrarProdSinStock();
+                cout << endl << "----------Sin stock-------------" << endl;
+                mostrarProductos(lista_sin_stock);
+                cout << endl << "----------Pesados-------------" << endl;
+                mostrarProductos(lista_pesados);
+                liberarP(lista_sin_stock);
+                liberarP(lista_pesados);
             }
             break;
         
@@ -394,4 +712,3 @@ int main(){
 
     return 0;
 }
-
