@@ -34,26 +34,30 @@ int main(){
         {
         case 1:
             {
-                
+                cout << endl << "Ejercicio 1 " << endl;
             }
             break;
         case 2:
             {
+                cout << endl << "Ejercicio 2" << endl;
 
             }
             break;
         case 3:
             {
+                cout << endl << "Ejercicio 3" << endl;
 
             }
             break;
         case 4:
-            {
+            {   
+                cout << endl << "Ejercicio 4" << endl;
 
             }
             break;
         case 5:
             {
+                cout << endl << "Ejercicio 5" << endl;
 
             }
             break;
