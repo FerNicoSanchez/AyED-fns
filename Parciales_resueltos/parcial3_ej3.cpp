@@ -47,17 +47,20 @@ void crearArchivo(Provincia reg_prov_carga[],int len){
 void mostrarDatosProvincia(){
     FILE * archivo_lectura = fopen("elecciones2023.dat","rb");
     Provincia reg_aux[cant_registros];
+    //Como el vector tiene la memoria continua podemos leer todo el archivo en 1 linea ya que sabemos su tamaño.
     fread(reg_aux,sizeof(struct Provincia),cant_registros,archivo_lectura);
-    int len = cant_registros;
-    fclose(archivo_lectura);
-    Provincia_T totales[cant_prov];
-    float prom_padron[cant_prov];
+    int len = cant_registros;   //No lo usamos pero lo escribo para mantener la buena práctica de vectores.
+    fclose(archivo_lectura);    //Ya leimos todo el archivo, lo cerramos.
+    Provincia_T totales[cant_prov]; //Estructura auxiliar para acumular los números de cada provincia.
+    float prom_padron[cant_prov];   //Variable auxiliar para calcular un promedio en cada prinvincia
 
-    for(int i_reg = 0, i_prov = 0 ; i_prov < cant_prov ; i_prov++){
+    for(int i_reg = 0, i_prov = 0 ; i_prov < cant_prov ; i_prov++){ //Recorremos según cantidad de provincias.
+        //Cargamos los datos iniciales del primer registro de cada provincia.
         totales[i_prov].cod_prov = reg_aux[i_reg].cod_prov;
         totales[i_prov].total_ciudadanos = reg_aux[i_reg].total_ciudadanos;
         totales[i_prov].votantes = reg_aux[i_reg].votantes;
         i_reg++;
+        //Recorremos el vector de registros para acumular los datos de cada provincia.
         while ( totales[i_prov].cod_prov == reg_aux[i_reg].cod_prov ){
             totales[i_prov].total_ciudadanos += reg_aux[i_reg].total_ciudadanos;
             totales[i_prov].votantes = reg_aux[i_reg].votantes;
@@ -65,9 +68,8 @@ void mostrarDatosProvincia(){
         }
         prom_padron[i_prov] = ( totales[i_prov].votantes / totales[i_prov].total_ciudadanos ) * 100;
     }
-    
     cout << endl << "---------- Resultados elecciones ----------" << endl;
-    for(int i = 0 ; i < cant_prov ; i++){
+    for(int i = 0 ; i < cant_prov ; i++){       //Recorremos nuevamente el vector para imprimir el resultado final.
         cout << endl << "Provincia: " << totales[i].cod_prov << endl;
         cout << "Total ciudadanos: " << totales[i].total_ciudadanos << endl;
         cout << "Padrón que se presento a votar: " << prom_padron[i] << " %" << endl;
