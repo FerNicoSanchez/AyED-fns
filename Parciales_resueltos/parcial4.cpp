@@ -22,8 +22,6 @@ struct Nodo{
 
 //--------Prototipos---------------
 
-Nodo * listaSinRepe(FILE * arch_lectura,Nodo *&lista);
-
 void agregarPrimero(Nodo *&lista, Venta valor);
 
 void mostrar(Nodo * lista);
@@ -32,37 +30,12 @@ void liberar(Nodo *&lista);
 
 void crearArchivo();
 
+Nodo * listaSinRepe(FILE * arch_lectura,Nodo *&lista);
+
 void Vtas100_200(Nodo *& lista, Venta vec[],int &len);
 
 
 //---Implementación de funciones---
-
-Nodo * listaSinRepe(FILE * arch_lectura,Nodo *&lista){          //Ejercicio 1
-    Venta reg_aux;
-    fread(&reg_aux,sizeof(struct Venta),1,arch_lectura);
-    if(lista == NULL){
-        Nodo * nuevo = new Nodo();
-        nuevo->info = reg_aux;
-        nuevo->sgte = NULL;
-        lista = nuevo;
-        return nuevo;
-    }
-    Nodo * aux = lista;
-    while( aux != NULL){
-        if( aux->info.codP == reg_aux.codP && aux->info.fact == reg_aux.fact){
-            return aux;
-        }
-        if ( aux->sgte == NULL){
-            Nodo * nuevo = new Nodo();
-            nuevo->info = reg_aux;
-            nuevo->sgte = NULL;
-            aux->sgte = nuevo;
-            return nuevo;
-        }
-        aux = aux->sgte;
-    }
-    return NULL;
-}
 
 void agregarPrimero(Nodo *&Lista,Venta valor){
     Nodo * nuevo = new Nodo();
@@ -105,6 +78,33 @@ void crearArchivo(){
     }
     cout << endl;
     fclose(archivo_prod);
+}
+
+Nodo * listaSinRepe(FILE * arch_lectura,Nodo *&lista){          //Ejercicio 1
+    Venta reg_aux;
+    fread(&reg_aux,sizeof(struct Venta),1,arch_lectura);
+    if(lista == NULL){
+        Nodo * nuevo = new Nodo();
+        nuevo->info = reg_aux;
+        nuevo->sgte = NULL;
+        lista = nuevo;
+        return nuevo;
+    }
+    Nodo * aux = lista;
+    while( aux != NULL){
+        if( aux->info.codP == reg_aux.codP && aux->info.fact == reg_aux.fact){
+            return aux;
+        }
+        if ( aux->sgte == NULL){
+            Nodo * nuevo = new Nodo();
+            nuevo->info = reg_aux;
+            nuevo->sgte = NULL;
+            aux->sgte = nuevo;
+            return nuevo;
+        }
+        aux = aux->sgte;
+    }
+    return NULL;
 }
 
 void Vtas100_200(Nodo *& lista, Venta vec[],int &len){          //Ejercicio 2
